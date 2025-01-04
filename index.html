@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloom - Sacred Digital Space</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2E3192;
+            --secondary: #1BFFFF;
+            --accent: #D4AF37;
+            --text: #333;
+            --background: #fafafa;
+            --plant-green: #4CAF50;
+            --flower-pink: #FF69B4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.95);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            background-clip: text;
+            background-clip: text;
+            background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            background: radial-gradient(circle at center, rgba(27,255,255,0.1) 0%, transparent 70%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1s ease forwards;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #666;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1s ease forwards 0.3s;
+        }
+
+        .features {
+            padding: 5rem 2rem;
+            background: white;
+            position: relative;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .feature-card {
+            padding: 2rem;
+            border-radius: 15px;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .plant-container {
+            position: absolute;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .plant {
+            position: absolute;
+            cursor: pointer;
+            pointer-events: all;
+            transition: transform 0.3s ease;
+        }
+
+        .plant:hover {
+            transform: scale(1.1);
+        }
+
+        .flower {
+            position: absolute;
+            cursor: pointer;
+            pointer-events: all;
+            transition: transform 0.3s ease;
+        }
+
+        .flower:hover {
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .vine {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        @keyframes sway {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        @keyframes grow {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        @keyframes bloom {
+            0% { transform: scale(0) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        .interactive-garden {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .garden-plot {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            pointer-events: all;
+        }
+
+        .seed-spot {
+            width: 60px;
+            height: 60px;
+            background: rgba(139, 69, 19, 0.2);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .seed-spot:hover {
+            background: rgba(139, 69, 19, 0.4);
+        }
+
+        .growing-plant {
+            position: absolute;
+            bottom: 0;
+            transform-origin: bottom center;
+            animation: grow 1s ease forwards;
+        }
+
+        .nav-button {
+            position: relative;
+            padding: 0.8rem 1.5rem;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s ease;
+            border-radius: 25px;
+        }
+
+        .nav-button:hover {
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-button:hover::before {
+            opacity: 1;
+        }
+
+        .nav-button::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-button:hover::after {
+            width: 80%;
+        }
+
+        .nav-button.active {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .nav-button .icon {
+            margin-right: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-button:hover .icon {
+            transform: rotate(360deg);
+        }
+
+
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            margin-top: 2rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+            opacity: 0;
+            animation: fadeUp 1s ease forwards 0.6s;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <canvas class="particles"></canvas>
+    
+    <nav class="navbar">
+        <div class="logo">Bloom</div>
+        <div class="nav-links">
+            <a href="#vision">Vision</a>
+            <a href="#features">Features</a>
+            <a href="#journey">Journey</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </nav>
+
+    <nav class="navbar">
+        <div class="logo">Bloom</div>
+        <div class="nav-links">
+            <button class="nav-button">
+                <i class="fas fa-eye icon"></i>
+                Vision
+            </button>
+            <button class="nav-button">
+                <i class="fas fa-star icon"></i>
+                Features
+            </button>
+            <button class="nav-button">
+                <i class="fas fa-road icon"></i>
+                Journey
+            </button>
+            <button class="nav-button">
+                <i class="fas fa-envelope icon"></i>
+                Contact
+            </button>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Welcome to Bloom</h1>
+            <p>"A digital space designed to help people feel more connected, inspired, and aligned in their daily lives. Instead of draining you, we're here to help you grow—to help you bloom."</p>
+            <a href="#learn-more" class="cta-button">Begin Your Journey</a>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fas fa-seedling feature-icon"></i>
+                <h3>Growth Journeys</h3>
+                <p>Custom feeds based on your interests and goals, helping you grow in the directions that matter most to you.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-sun feature-icon"></i>
+                <h3>Resonance</h3>
+                <p>Experience content that aligns with your current state and elevates your vibration.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-star feature-icon"></i>
+                <h3>Orbits</h3>
+                <p>Explore dimensional communities and connect with like-minded individuals in your universe.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="interactive-garden">
+        <div class="garden-plot">
+            <div class="seed-spot"></div>
+            <div class="seed-spot"></div>
+            <div class="seed-spot"></div>
+            <div class="seed-spot"></div>
+            <div class="seed-spot"></div>
+        </div>
+    </div>
+
+    <script>
+        // Particle animation
+        const canvas = document.querySelector('.particles');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+
+            draw() {
+                ctx.fillStyle = 'rgba(46, 49, 146, 0.1)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Plant and flower creation
+        function createPlant(x, y) {
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.setAttribute("viewBox", "0 0 100 200");
+            svg.style.width = "60px";
+            svg.style.height = "120px";
+            svg.classList.add("growing-plant");
+            svg.style.left = x + "px";
+
+            // Stem
+            const stem = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            stem.setAttribute("d", "M50,200 Q50,150 50,100");
+            stem.setAttribute("stroke", "#4CAF50");
+            stem.setAttribute("stroke-width", "4");
+            stem.setAttribute("fill", "none");
+
+            // Leaves
+            const leaf1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            leaf1.setAttribute("d", "M50,150 Q70,140 60,120");
+            leaf1.setAttribute("stroke", "#4CAF50");
+            leaf1.setAttribute("stroke-width", "3");
+            leaf1.setAttribute("fill", "#81C784");
+
+            const leaf2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            leaf2.setAttribute("d", "M50,130 Q30,120 40,100");
+            leaf2.setAttribute("stroke", "#4CAF50");
+            leaf2.setAttribute("stroke-width", "3");
+            leaf2.setAttribute("fill", "#81C784");
+
+            // Flower
+            const flower = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            for (let i = 0; i < 8; i++) {
+                const petal = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
+                const angle = (i * Math.PI) / 4;
+                petal.setAttribute("cx", "50");
+                petal.setAttribute("cy", "85");
+                petal.setAttribute("rx", "15");
+                petal.setAttribute("ry", "8");
+                petal.setAttribute("transform", `rotate(${i * 45} 50 85)`);
+                petal.setAttribute("fill", "#FF69B4");
+                flower.appendChild(petal);
+            }
+
+             // Navigation functionality
+        const navButtons = document.querySelectorAll('.nav-button');
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                button.classList.add('active');
+
+                // Smooth scroll to section
+                const targetSection = button.textContent.trim().toLowerCase();
+                const section = document.getElementById(targetSection);
+                if (section) {
+                    section.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Scroll spy functionality
+        window.addEventListener('scroll', () => {
+            const scrollPosition = window.scrollY;
+
+            // Get all sections
+            const sections = document.querySelectorAll('section');
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                const sectionHeight = section.clientHeight;
+                const sectionId = section.id;
+
+                if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                    navButtons.forEach(button => {
+                        if (button.textContent.trim().toLowerCase() === sectionId) {
+                            button.classList.add('active');
+                        } else {
+                            button.classList.remove('active');
+                        }
+                    });
+                }
+            });
+        });
+
+            const center = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            center.setAttribute("cx", "50");
+            center.setAttribute("cy", "85");
+            center.setAttribute("r", "5");
+            center.setAttribute("fill", "#FFD700");
+
+            svg.appendChild(stem);
+            svg.appendChild(leaf1);
+            svg.appendChild(leaf2);
+            svg.appendChild(flower);
+            svg.appendChild(center);
+
+            return svg;
+        }
+
+        // Interactive garden initialization
+        document.querySelectorAll('.seed-spot').forEach(spot => {
+            spot.addEventListener('click', (e) => {
+                const rect = spot.getBoundingClientRect();
+                const plant = createPlant(rect.left);
+                document.querySelector('.interactive-garden').appendChild(plant);
+                
+                // Add growth animation
+                plant.style.animation = 'grow 1.5s ease-out forwards';
+                
+                // Disable the seed spot after planting
+                spot.style.pointerEvents = 'none';
+                spot.style.background = 'rgba(139, 69, 19, 0.1)';
+            });
+        });
+
+        function init() {
+            particles = [];
+            for (let i = 0; i < 100; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let particle of particles) {
+                particle.update();
+                particle.draw();
+            }
+            
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        init();
+        animate();
+    </script>
+</body>
+</html>
